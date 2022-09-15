@@ -1,11 +1,47 @@
 apiVersion: carto.run/v1alpha1
 kind: Workload
 metadata:
-  name: acme-fitness
+  name: acme-catalog
   labels:
     apps.tanzu.vmware.com/workload-type: server
-    apps.tanzu.vmware.com/has-tests: true
+    apps.tanzu.vmware.com/has-tests: "true"  # Needed for test and scan-test supply chains
 spec:
+  params:
+  - name: ports
+    value:
+    - name: http-catalog
+      protocol: TCP
+      port: 8082
+  env:
+  # These are copied from kubernetes-manifests/catalog-total.yaml
+  - name: CATALOG_DB_HOST
+    value: 'catalog-mongo'
+  - name: CATALOG_DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: catalog-mongo-pass
+        key: password
+  - name: CATALOG_DB_PORT
+    value: '27017'
+  - name: CATALOG_DB_USERNAME
+    value: 'mongoadmin'
+  - name: CATALOG_PORT
+    value: '8082'
+  - name: CATALOG_VERSION
+    value: 'v1'
+  - name: USERS_HOST
+    value: 'users'
+  - name: USERS_PORT
+    value: '8083'
+  - name: ZIPKIN_URL
+    value: http://wavefront-proxy:9411
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
   source:
     git:
       url: https://github.com/evankanderson/acme-fitness-store
