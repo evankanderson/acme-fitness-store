@@ -25,7 +25,7 @@ spec:
         type: string
       spec: null
       steps:
-      - image: gradle
+      - image: debian # was: gradle
         name: test
         script: |-
           exit 0
