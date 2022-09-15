@@ -1,0 +1,50 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: acme-cart
+  labels:
+    apps.tanzu.vmware.com/workload-type: server
+    apps.tanzu.vmware.com/has-tests: "true"  # Needed for test and scan-test supply chains
+spec:
+  source:
+    git:
+      url: https://github.com/evankanderson/acme-fitness-store
+      ref:
+        branch: Azure
+    subPath: apps/acme-cart
+  params:
+  - name: ports
+    value:
+      - containerPort: 5000
+        name: cart
+        port: 5000
+  env:
+  # These are copied from kubernetes-manifests/cart-total.yaml
+  - name: REDIS_HOST
+    value: 'cart-redis'
+  - name: REDIS_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: cart-redis-pass
+        key: password
+  - name: REDIS_PORT
+    value: '6379'
+  - name: CART_PORT
+    value: '5000'
+  - name: USER_HOST
+    value: 'gateway'
+  - name: USER_PORT
+    value: '80'
+  - name: TRACER_HOST
+    value: 'wavefront-proxy'
+  - name: TRACER_PORT
+    value: '9411'
+  - name: AUTH_MODE
+    value: '1'
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"

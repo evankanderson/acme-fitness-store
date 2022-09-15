@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  labels:
+    app: acmefit
+    service: payment
+spec:
+  ports:
+    - name: http-payment
+      protocol: TCP
+      port: 9000
+  selector:
+    app: acmefit
+    service: payment
+---
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: acme-payment
+  labels:
+    apps.tanzu.vmware.com/workload-type: server
+    apps.tanzu.vmware.com/has-tests: "true"  # Needed for test and scan-test supply chains
+spec:
+  source:
+    git:
+      url: https://github.com/evankanderson/acme-fitness-store
+      ref:
+        branch: Azure
+    subPath: apps/acme-payment
+  params:
+  - name: ports
+    value:
+      - containerPort: 8080
+        name: cart
+        port: 9000
+  env:
+  - name: PAYMENT_PORT
+    value: '9000'
+  - name: USERS_HOST
+    value: 'users'
+  - name: USERS_PORT
+    value: '8083'
+  - name: ZIPKIN_URL
+    value: http://wavefront-proxy:9411

@@ -1,0 +1,62 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: acme-order
+  labels:
+    apps.tanzu.vmware.com/workload-type: server
+    apps.tanzu.vmware.com/has-tests: "true"  # Needed for test and scan-test supply chains
+spec:
+  source:
+    git:
+      url: https://github.com/evankanderson/acme-fitness-store
+      ref:
+        branch: Azure
+    subPath: apps/acme-order
+  params:
+  - name: ports
+    value:
+      - containerPort: 6000
+        name: http-order
+        port: 6000
+  env:
+  - name: ORDER_DB_HOST
+    value: order-postgres
+  - name: ORDER_DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: order-postgres-pass
+        key: password
+  - name: ORDER_DB_PORT
+    value: '5432'
+  - name: AUTH_MODE
+    value: '1'
+  - name: ORDER_DB_USERNAME
+    value: pgbench
+  - name: PGPASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: order-postgres-pass
+        key: password
+  - name: ORDER_AUTH_DB
+    value: postgres
+  - name: ORDER_PORT
+    value: '6000'
+  - name: PAYMENT_PORT
+    value: '9000'
+  - name: PAYMENT_HOST
+    value: 'acme-payment'
+  - name: USER_HOST
+    value: 'gateway'
+  - name: USER_PORT
+    value: '80'
+  - name: TRACER_HOST
+    value: 'wavefront-proxy'
+  - name: TRACER_PORT
+    value: '9411'
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"

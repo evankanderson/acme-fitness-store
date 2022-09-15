@@ -1,0 +1,14 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: acme-frontend
+  labels:
+    apps.tanzu.vmware.com/workload-type: server
+spec:
+  image: springcloudservices/fitness-frontend
+  params:
+  - name: ports
+    value:
+      - containerPort: 8080
+        name: http-frontend
+        port: 80

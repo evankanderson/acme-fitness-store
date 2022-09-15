@@ -6,12 +6,19 @@ metadata:
     apps.tanzu.vmware.com/workload-type: server
     apps.tanzu.vmware.com/has-tests: "true"  # Needed for test and scan-test supply chains
 spec:
+  source:
+    git:
+      url: https://github.com/evankanderson/acme-fitness-store
+      ref:
+        branch: Azure
+    subPath: apps/acme-catalog
   params:
   - name: ports
     value:
     - name: http-catalog
       protocol: TCP
       port: 8082
+      containerPort: 8080
   env:
   # These are copied from kubernetes-manifests/catalog-total.yaml
   - name: CATALOG_DB_HOST
@@ -30,7 +37,7 @@ spec:
   - name: CATALOG_VERSION
     value: 'v1'
   - name: USERS_HOST
-    value: 'users'
+    value: 'acme-users'
   - name: USERS_PORT
     value: '8083'
   - name: ZIPKIN_URL
@@ -40,11 +47,5 @@ spec:
       memory: "64Mi"
       cpu: "100m"
     limits:
-      memory: "256Mi"
+      memory: "1.2Gi"
       cpu: "500m"
-  source:
-    git:
-      url: https://github.com/evankanderson/acme-fitness-store
-      ref:
-        branch: Azure
-    subPath: apps/acme-catalog
