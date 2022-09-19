@@ -1,0 +1,52 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: acme-users
+  labels:
+    apps.tanzu.vmware.com/workload-type: server
+    apps.tanzu.vmware.com/has-tests: "true"  # Needed for test and scan-test supply chains
+spec:
+  source:
+    git:
+      url: https://github.com/evankanderson/acme-fitness-store
+      ref:
+        branch: Azure
+    subPath: apps/acme-identity
+  params:
+  - name: ports
+    value:
+      - containerPort: 8080
+        name: cart
+        port: 8083
+  env:
+  - name: USERS_DB_HOST
+    value: 'users-mongo'
+  - name: USERS_DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: users-mongo-pass
+        key: password
+  - name: USERS_DB_PORT
+    value: '27017'
+  - name: USERS_DB_USERNAME
+    value: 'mongoadmin'
+  - name: USERS_PORT
+    value: '8083'
+  - name: REDIS_HOST
+    value: 'users-redis'
+  - name: REDIS_PORT
+    value: '6379'
+  - name: REDIS_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: users-redis-pass
+        key: password
+  - name: ZIPKIN_URL
+    value: http://wavefront-proxy:9411
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"

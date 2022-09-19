@@ -1,7 +1,7 @@
-apiVersion: carto.run/v1alpha1
+apiVersion: carto.run/v1alpha1 # for versions before 1.8.0 use apps/v1beta1
 kind: Workload
 metadata:
-  name: acme-payment
+  name: acme-pos
   labels:
     apps.tanzu.vmware.com/workload-type: server
     apps.tanzu.vmware.com/has-tests: "true"  # Needed for test and scan-test supply chains
@@ -11,19 +11,17 @@ spec:
       url: https://github.com/evankanderson/acme-fitness-store
       ref:
         branch: Azure
-    subPath: apps/acme-payment
+    subPath: apps/acme-shopping
   params:
   - name: ports
     value:
-      - containerPort: 8080
+      - containerPort: 7777
         name: cart
-        port: 9000
+        port: 7777
   env:
-  - name: PAYMENT_PORT
-    value: '9000'
-  - name: USERS_HOST
-    value: 'acme-users'
-  - name: USERS_PORT
-    value: '8083'
-  - name: ZIPKIN_URL
-    value: http://wavefront-proxy:9411
+  - name: HTTP_PORT
+    value: '7777'
+  - name: DATASTORE
+    value: 'REMOTE'
+  - name: FRONTEND_HOST
+    value: 'acme-frontend'
